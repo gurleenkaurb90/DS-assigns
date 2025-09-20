@@ -1,0 +1,472 @@
+// dsa_toolkit.cpp
+#include <iostream>
+#include <cstring>
+#include <cctype>
+#include <cstdlib>
+using namespace std;
+
+#define MAX 200
+#define MAX_STRINGS 50
+#define MAX_STR_LEN 100
+#define MAX_TRIPLETS 500
+#define MAX_MATRIX 50
+
+// ---------- Utility (swap)
+void swapInt(int &a, int &b) { int t = a; a = b; b = t; }
+void swapCharArray(char a[], char b[]) {
+    char temp[MAX_STR_LEN];
+    strcpy(temp, a);
+    strcpy(a, b);
+    strcpy(b, temp);
+}
+
+// ================= 1) Binary Search =================
+int binarySearch(int arr[], int n, int key) {
+    int low = 0, high = n - 1;
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+        if (arr[mid] == key) return mid;
+        else if (arr[mid] < key) low = mid + 1;
+        else high = mid - 1;
+    }
+    return -1;
+}
+
+// ================= 2) Bubble Sort (given fixed elements) =================
+void bubbleSortFixed() {
+    int arr[] = {64, 34, 25, 12, 22, 11};
+    int n = 6;
+    for (int i = 0; i < n-1; i++)
+        for (int j = 0; j < n-i-1; j++)
+            if (arr[j] > arr[j+1]) swapInt(arr[j], arr[j+1]);
+
+    cout << "Bubble sorted array: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << "\n";
+}
+
+// ================= 3) Find Missing Number in Sorted Array =================
+// Assume sorted array of consecutive integers except one missing.
+// Method: check difference between value and index
+void findMissingNumber() {
+    int n;
+    cout << "Enter number of elements in sorted array: ";
+    cin >> n;
+    int arr[MAX];
+    cout << "Enter sorted elements: ";
+    for (int i = 0; i < n; i++) cin >> arr[i];
+
+    // If numbers are supposed to be consecutive starting arr[0]
+    int expected = arr[0];
+    for (int i = 0; i < n; i++) {
+        if (arr[i] != expected) {
+            cout << "Missing number: " << expected << "\n";
+            return;
+        }
+        expected++;
+    }
+    cout << "No missing number in the sequence (or missing after last element).\n";
+}
+
+// ================= 4) String Related Programs (no STL) =================
+void concatStrings() {
+    static char s1[MAX_STR_LEN], s2[MAX_STR_LEN];
+    cout << "Enter first string (no spaces): "; cin >> s1;
+    cout << "Enter second string (no spaces): "; cin >> s2;
+    strcat(s1, s2);
+    cout << "Concatenated: " << s1 << "\n";
+}
+
+void reverseString() {
+    static char s[MAX_STR_LEN];
+    cout << "Enter string (no spaces): "; cin >> s;
+    int len = strlen(s);
+    for (int i = 0; i < len/2; i++) swapCharArray(s + i, s + (len - 1 - i)); // incorrect usage avoided below
+    // Simpler manual reverse:
+    for (int i = 0, j = len - 1; i < j; i++, j--) {
+        char t = s[i]; s[i] = s[j]; s[j] = t;
+    }
+    cout << "Reversed: " << s << "\n";
+}
+
+void deleteVowels() {
+    static char s[MAX_STR_LEN];
+    cout << "Enter string (no spaces): "; cin >> s;
+    char res[MAX_STR_LEN]; int idx = 0;
+    for (int i = 0; s[i] != '\0'; i++) {
+        char c = s[i];
+        char lower = tolower(c);
+        if (lower=='a' || lower=='e' || lower=='i' || lower=='o' || lower=='u') continue;
+        res[idx++] = c;
+    }
+    res[idx] = '\0';
+    cout << "Without vowels: " << res << "\n";
+}
+
+int strcmp_custom(const char *a, const char *b) {
+    // same behavior as strcmp
+    return strcmp(a,b);
+}
+
+void sortStringsAlphabetical() {
+    int n;
+    cout << "How many strings? "; cin >> n;
+    static char arr[MAX_STRINGS][MAX_STR_LEN];
+    for (int i = 0; i < n; i++) {
+        cout << "Enter string " << i+1 << " (no spaces): ";
+        cin >> arr[i];
+    }
+    // bubble sort
+    for (int i = 0; i < n-1; i++) {
+        for (int j = 0; j < n-1-i; j++) {
+            if (strcmp_custom(arr[j], arr[j+1]) > 0) {
+                char tmp[MAX_STR_LEN];
+                strcpy(tmp, arr[j]);
+                strcpy(arr[j], arr[j+1]);
+                strcpy(arr[j+1], tmp);
+            }
+        }
+    }
+    cout << "Sorted strings:\n";
+    for (int i = 0; i < n; i++) cout << arr[i] << "\n";
+}
+
+void upperToLower() {
+    char c;
+    cout << "Enter an uppercase character: "; cin >> c;
+    if (isupper((unsigned char)c)) cout << "Lowercase: " << (char)tolower(c) << "\n";
+    else cout << "Input is not uppercase. Converted: " << (char)tolower(c) << "\n";
+}
+
+// ================= 5) Efficient Storage of Special Matrices =================
+// We'll show how to store into 1D arrays and allow retrieval/printing.
+// (a) Diagonal Matrix: store only diagonal elements in array size n
+void diagonalMatrixOps() {
+    int n; cout << "Enter size of diagonal matrix: "; cin >> n;
+    int *diag = new int[n];
+    cout << "Enter diagonal elements (" << n << " values): ";
+    for (int i = 0; i < n; i++) cin >> diag[i];
+    cout << "Full matrix:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) cout << (i==j ? diag[i] : 0) << " ";
+        cout << "\n";
+    }
+    delete[] diag;
+}
+
+// (b) Tri-diagonal Matrix: store three diagonals in 1D array size 3n-2. Index mapping:
+// store in array T with index: for row i (0-based):
+// - T[i] = below diagonal (except first row doesn't have)
+// - T[n-1 + i] = main diagonal at row i
+// - T[2n-1 + i] = above diagonal (except last row)
+void tridiagonalMatrixOps() {
+    int n; cout << "Enter size of tri-diagonal matrix: "; cin >> n;
+    int size = 3*n - 2;
+    int *t = new int[size];
+    cout << "Enter tri-diagonal elements in order (subDiag row1..row{n-1}, mainDiag row0..row{n-1}, superDiag row0..row{n-2}):\n";
+    for (int i = 0; i < size; i++) cin >> t[i];
+    cout << "Full matrix:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            int val = 0;
+            if (j == i-1) val = t[i-1];              // sub diagonal stored at 0..n-2
+            else if (j == i) val = t[n-1 + i];      // main diagonal stored at n-1 .. 2n-2
+            else if (j == i+1) val = t[2*n - 1 + i]; // super diag stored at 2n-1 .. 3n-3 (only n-1 elements)
+            cout << val << " ";
+        }
+        cout << "\n";
+    }
+    delete[] t;
+}
+
+// (c) Lower triangular matrix: store elements row-wise in 1D array of size n*(n+1)/2.
+// mapping: index for element (i,j) with i>=j (0-indexed) => idx = i*(i+1)/2 + j
+void lowerTriangularOps() {
+    int n; cout << "Enter size of lower triangular matrix: "; cin >> n;
+    int size = n*(n+1)/2;
+    int *a = new int[size];
+    cout << "Enter lower triangular elements row-wise (row0 col0; row1 col0..col1; ...):\n";
+    for (int i = 0; i < size; i++) cin >> a[i];
+    cout << "Full matrix:\n";
+    for (int i = 0, idx = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (j <= i) {
+                cout << a[i*(i+1)/2 + j] << " ";
+            } else cout << 0 << " ";
+        }
+        cout << "\n";
+    }
+    delete[] a;
+}
+
+// (d) Upper triangular store row-wise in 1D of size n*(n+1)/2. mapping if i<=j:
+// idx = i*n - (i*(i-1))/2 + (j-i)  -> simpler to just fill and print using input order
+void upperTriangularOps() {
+    int n; cout << "Enter size of upper triangular matrix: "; cin >> n;
+    int size = n*(n+1)/2;
+    int *a = new int[size];
+    cout << "Enter upper triangular elements row-wise (row0 col0..col{n-1}; row1 col1..; ...):\n";
+    for (int i = 0; i < size; i++) cin >> a[i];
+    cout << "Full matrix:\n";
+    int idx = 0;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (j >= i) {
+                cout << a[idx++] << " ";
+            } else cout << 0 << " ";
+        }
+        cout << "\n";
+    }
+    delete[] a;
+}
+
+// (e) Symmetric matrix: store lower triangular (or upper) size n*(n+1)/2, retrieve symmetrical
+void symmetricMatrixOps() {
+    int n; cout << "Enter size of symmetric matrix: "; cin >> n;
+    int size = n*(n+1)/2;
+    int *a = new int[size];
+    cout << "Enter lower triangular part row-wise (including diagonal):\n";
+    for (int i = 0; i < size; i++) cin >> a[i];
+    cout << "Full symmetric matrix:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            int val;
+            if (i >= j) val = a[i*(i+1)/2 + j];
+            else val = a[j*(j+1)/2 + i];
+            cout << val << " ";
+        }
+        cout << "\n";
+    }
+    delete[] a;
+}
+
+// ================= 6) Sparse Matrix (Triplet) =================
+struct Triplet { int r, c, v; };
+
+void readTriplets(Triplet T[], int &tcount, int &rows, int &cols) {
+    cout << "Enter rows and cols: "; cin >> rows >> cols;
+    cout << "Enter number of non-zero elements: "; cin >> tcount;
+    cout << "Enter triplets as: row col value (0-based indices):\n";
+    for (int i = 0; i < tcount; i++) cin >> T[i].r >> T[i].c >> T[i].v;
+}
+
+void printTriplets(Triplet T[], int tcount) {
+    cout << "Triplets (r c v):\n";
+    for (int i = 0; i < tcount; i++) cout << T[i].r << " " << T[i].c << " " << T[i].v << "\n";
+}
+
+void sparseTranspose(Triplet A[], int nA, int rows, int cols) {
+    Triplet B[MAX_TRIPLETS];
+    int k = 0;
+    // naive column-by-column
+    for (int j = 0; j < cols; j++) {
+        for (int i = 0; i < nA; i++) {
+            if (A[i].c == j) {
+                B[k].r = A[i].c;
+                B[k].c = A[i].r;
+                B[k].v = A[i].v;
+                k++;
+            }
+        }
+    }
+    cout << "Transpose:\n";
+    printTriplets(B, k);
+}
+
+// Addition of two sparse matrices (same dims)
+// naive O(n1*n2) merging by coordinates
+void sparseAdd(Triplet A[], int nA, Triplet B[], int nB) {
+    Triplet R[MAX_TRIPLETS];
+    int k = 0;
+    // copy A
+    for (int i = 0; i < nA; i++) R[k++] = A[i];
+    // for each B element, find if position exists in R — if yes add, else append
+    for (int i = 0; i < nB; i++) {
+        bool found = false;
+        for (int j = 0; j < k; j++) {
+            if (R[j].r == B[i].r && R[j].c == B[i].c) {
+                R[j].v += B[i].v;
+                found = true;
+                break;
+            }
+        }
+        if (!found) R[k++] = B[i];
+    }
+    // remove zeros if any
+    int kk = 0;
+    for (int i = 0; i < k; i++) if (R[i].v != 0) R[kk++] = R[i];
+    cout << "Result of addition (triplets):\n";
+    printTriplets(R, kk);
+}
+
+// Multiplication: A (m x n) * B (n x p) = C (m x p)
+// Triplet arrays A and B are used. We compute result dense then print triplets.
+void sparseMultiply(Triplet A[], int nA, int rowsA, int colsA, Triplet B[], int nB, int rowsB, int colsB) {
+    if (colsA != rowsB) { cout << "Dimension mismatch for multiplication\n"; return; }
+    int m = rowsA, p = colsB;
+    // make dense zero
+    int C[MAX_MATRIX][MAX_MATRIX];
+    for (int i = 0; i < m; i++) for (int j = 0; j < p; j++) C[i][j] = 0;
+    // for each a in A and b in B where a.c == b.r, add a.v * b.v to C[a.r][b.c]
+    for (int i = 0; i < nA; i++) {
+        for (int j = 0; j < nB; j++) {
+            if (A[i].c == B[j].r) {
+                C[A[i].r][B[j].c] += A[i].v * B[j].v;
+            }
+        }
+    }
+    // print triplets of non-zero entries
+    cout << "Result C triplets (r c v):\n";
+    for (int i = 0; i < m; i++)
+        for (int j = 0; j < p; j++)
+            if (C[i][j] != 0) cout << i << " " << j << " " << C[i][j] << "\n";
+}
+
+// ================= 7) Count inversions (merge sort) =================
+long long mergeAndCount(int arr[], int left, int mid, int right) {
+    int n1 = mid - left + 1;
+    int n2 = right - mid;
+    int *L = new int[n1];
+    int *R = new int[n2];
+    for (int i = 0; i < n1; i++) L[i] = arr[left + i];
+    for (int j = 0; j < n2; j++) R[j] = arr[mid + 1 + j];
+
+    int i = 0, j = 0, k = left;
+    long long inv = 0;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) arr[k++] = L[i++];
+        else { arr[k++] = R[j++]; inv += (n1 - i); }
+    }
+    while (i < n1) arr[k++] = L[i++];
+    while (j < n2) arr[k++] = R[j++];
+    delete[] L; delete[] R;
+    return inv;
+}
+
+long long mergeSortCount(int arr[], int left, int right) {
+    long long inv = 0;
+    if (left < right) {
+        int mid = left + (right - left) / 2;
+        inv += mergeSortCount(arr, left, mid);
+        inv += mergeSortCount(arr, mid+1, right);
+        inv += mergeAndCount(arr, left, mid, right);
+    }
+    return inv;
+}
+
+// ================= 8) Count distinct elements in array =================
+// We'll sort array using simple quicksort (no STL) then count unique elements
+int partition_qs(int a[], int l, int h) {
+    int pivot = a[h];
+    int i = l - 1;
+    for (int j = l; j <= h-1; j++) {
+        if (a[j] <= pivot) { i++; swapInt(a[i], a[j]); }
+    }
+    swapInt(a[i+1], a[h]);
+    return i+1;
+}
+void quickSort(int a[], int l, int h) {
+    if (l < h) {
+        int p = partition_qs(a, l, h);
+        quickSort(a, l, p-1);
+        quickSort(a, p+1, h);
+    }
+}
+
+int countDistinct(int arr[], int n) {
+    if (n == 0) return 0;
+    quickSort(arr, 0, n-1);
+    int cnt = 1;
+    for (int i = 1; i < n; i++) if (arr[i] != arr[i-1]) cnt++;
+    return cnt;
+}
+
+// ================ Combined Menu & Operations ================
+void menu() {
+    while (true) {
+        cout << "\n==== DSA TOOLKIT (no STL) ====\n";
+        cout << "1. Binary Search (requires sorted array input)\n";
+        cout << "2. Bubble Sort (fixed elements demonstrated)\n";
+        cout << "3. Find Missing Number in Sorted Array\n";
+        cout << "4. String operations\n";
+        cout << "5. Matrix storage optimizations (diagonal, tri, lower, upper, symmetric)\n";
+        cout << "6. Sparse Matrix operations (triplet): Transpose, Add, Multiply\n";
+        cout << "7. Count inversions in an array\n";
+        cout << "8. Count distinct elements in an array\n";
+        cout << "9. Exit\n";
+        cout << "Enter choice: ";
+        int ch; cin >> ch;
+        if (ch == 1) {
+            int n; cout << "Enter size of sorted array: "; cin >> n;
+            int *a = new int[n];
+            cout << "Enter sorted elements: ";
+            for (int i = 0; i < n; i++) cin >> a[i];
+            int key; cout << "Enter key to search: "; cin >> key;
+            int pos = binarySearch(a, n, key);
+            if (pos == -1) cout << "Not found\n"; else cout << "Found at index " << pos << "\n";
+            delete[] a;
+        } else if (ch == 2) bubbleSortFixed();
+        else if (ch == 3) findMissingNumber();
+        else if (ch == 4) {
+            cout << "String Ops Menu:\n1.Concat 2.Reverse 3.Delete vowels 4.Sort strings 5.Upper->lower\nEnter choice: ";
+            int s; cin >> s;
+            if (s == 1) concatStrings();
+            else if (s == 2) reverseString();
+            else if (s == 3) deleteVowels();
+            else if (s == 4) sortStringsAlphabetical();
+            else if (s == 5) upperToLower();
+            else cout << "Invalid string op\n";
+        } else if (ch == 5) {
+            cout << "Matrix storage Menu:\n1.Diagonal 2.Tri-diagonal 3.Lower triangular 4.Upper triangular 5.Symmetric\nEnter choice: ";
+            int m; cin >> m;
+            if (m == 1) diagonalMatrixOps();
+            else if (m == 2) tridiagonalMatrixOps();
+            else if (m == 3) lowerTriangularOps();
+            else if (m == 4) upperTriangularOps();
+            else if (m == 5) symmetricMatrixOps();
+            else cout << "Invalid\n";
+        } else if (ch == 6) {
+            cout << "Sparse Ops Menu:\n1.Transpose\n2.Addition\n3.Multiplication\nEnter choice: ";
+            int s; cin >> s;
+            if (s == 1) {
+                Triplet A[MAX_TRIPLETS]; int nA, rA, cA;
+                readTriplets(A, nA, rA, cA);
+                sparseTranspose(A, nA, rA, cA);
+            } else if (s == 2) {
+                Triplet A[MAX_TRIPLETS], B[MAX_TRIPLETS]; int nA, nB, rA, cA, rB, cB;
+                cout << "Matrix A:\n"; readTriplets(A, nA, rA, cA);
+                cout << "Matrix B:\n"; readTriplets(B, nB, rB, cB);
+                if (rA != rB || cA != cB) cout << "Dimension mismatch for addition\n";
+                else sparseAdd(A, nA, B, nB);
+            } else if (s == 3) {
+                Triplet A[MAX_TRIPLETS], B[MAX_TRIPLETS]; int nA, nB, rA, cA, rB, cB;
+                cout << "Matrix A:\n"; readTriplets(A, nA, rA, cA);
+                cout << "Matrix B:\n"; readTriplets(B, nB, rB, cB);
+                sparseMultiply(A, nA, rA, cA, B, nB, rB, cB);
+            } else cout << "Invalid\n";
+        } else if (ch == 7) {
+            int n; cout << "Enter n: "; cin >> n;
+            int *a = new int[n];
+            cout << "Enter elements: ";
+            for (int i = 0; i < n; i++) cin >> a[i];
+            long long inv = mergeSortCount(a, 0, n-1);
+            cout << "Number of inversions: " << inv << "\n";
+            delete[] a;
+        } else if (ch == 8) {
+            int n; cout << "Enter n: "; cin >> n;
+            int *a = new int[n];
+            cout << "Enter elements: ";
+            for (int i = 0; i < n; i++) cin >> a[i];
+            int d = countDistinct(a, n);
+            cout << "Distinct elements: " << d << "\n";
+            delete[] a;
+        } else if (ch == 9) {
+            cout << "Exiting.\n"; break;
+        } else cout << "Invalid choice\n";
+    }
+}
+
+int main() {
+    menu();
+    return 0;
+}
