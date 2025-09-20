@@ -1,0 +1,245 @@
+#include <iostream>
+#include <cstring>
+using namespace std;
+#define MAX 100
+
+// ================== SIMPLE QUEUE ==================
+class SimpleQueue {
+    int arr[MAX];
+    int front, rear;
+public:
+    SimpleQueue() { front = -1; rear = -1; }
+    bool isEmpty() { return front == -1; }
+    bool isFull() { return rear == MAX-1; }
+    void enqueue(int x) {
+        if(isFull()) cout << "Queue Overflow\n";
+        else {
+            if(front==-1) front=0;
+            arr[++rear]=x;
+        }
+    }
+    int dequeue() {
+        if(isEmpty()) {
+            cout << "Queue Underflow\n";
+            return -1;
+        }
+        int val=arr[front];
+        if(front==rear) front=rear=-1;
+        else front++;
+        return val;
+    }
+    int peek() {
+        if(isEmpty()) return -1;
+        return arr[front];
+    }
+    void display() {
+        if(isEmpty()) cout << "Queue Empty\n";
+        else {
+            for(int i=front;i<=rear;i++) cout << arr[i] << " ";
+            cout << endl;
+        }
+    }
+};
+
+// ================== CIRCULAR QUEUE ==================
+class CircularQueue {
+    int arr[MAX];
+    int front, rear;
+public:
+    CircularQueue() { front=rear=-1; }
+    bool isEmpty() { return front==-1; }
+    bool isFull() { return (front==0 && rear==MAX-1) || (rear+1==front); }
+    void enqueue(int x) {
+        if(isFull()) cout << "Circular Queue Overflow\n";
+        else {
+            if(front==-1) front=0;
+            rear=(rear+1)%MAX;
+            arr[rear]=x;
+        }
+    }
+    int dequeue() {
+        if(isEmpty()) {
+            cout << "Circular Queue Underflow\n";
+            return -1;
+        }
+        int val=arr[front];
+        if(front==rear) front=rear=-1;
+        else front=(front+1)%MAX;
+        return val;
+    }
+    int peek() {
+        if(isEmpty()) return -1;
+        return arr[front];
+    }
+    void display() {
+        if(isEmpty()) cout << "Circular Queue Empty\n";
+        else {
+            int i=front;
+            while(true) {
+                cout << arr[i] << " ";
+                if(i==rear) break;
+                i=(i+1)%MAX;
+            }
+            cout << endl;
+        }
+    }
+};
+
+// ================== 3. Interleave Queue ==================
+void interleaveQueue() {
+    SimpleQueue q1, q2;
+    int n, x;
+    cout << "Enter number of elements (even): ";
+    cin >> n;
+    cout << "Enter elements: ";
+    for(int i=0;i<n;i++) { cin >> x; q1.enqueue(x); }
+
+    // Split into two halves
+    for(int i=0;i<n/2;i++) q2.enqueue(q1.dequeue());
+
+    // Interleave
+    cout << "Interleaved Queue: ";
+    while(!q1.isEmpty() && !q2.isEmpty()) {
+        cout << q2.dequeue() << " ";
+        cout << q1.dequeue() << " ";
+    }
+    cout << endl;
+}
+
+// ================== 4. First Non-Repeating Character ==================
+void firstNonRepeating() {
+    char str[MAX];
+    cout << "Enter string: ";
+    cin >> str;
+    int freq[256]={0};
+    SimpleQueue q;
+    for(int i=0; str[i]!='\0'; i++) {
+        char ch=str[i];
+        freq[ch]++;
+        q.enqueue(ch);
+        while(!q.isEmpty() && freq[q.peek()]>1) q.dequeue();
+        if(q.isEmpty()) cout << -1 << " ";
+        else cout << (char)q.peek() << " ";
+    }
+    cout << endl;
+}
+
+// ================== 5a. Stack using Two Queues ==================
+class Stack2Q {
+    SimpleQueue q1, q2;
+public:
+    void push(int x) {
+        q2.enqueue(x);
+        while(!q1.isEmpty()) q2.enqueue(q1.dequeue());
+        // swap q1 and q2
+        SimpleQueue temp = q1;
+        q1 = q2;
+        q2 = temp;
+    }
+    int pop() {
+        if(q1.isEmpty()) return -1;
+        return q1.dequeue();
+    }
+    int top() { return q1.peek(); }
+};
+
+// ================== 5b. Stack using One Queue ==================
+class Stack1Q {
+    SimpleQueue q;
+public:
+    void push(int x) {
+        int size=0;
+        while(!q.isEmpty()) { q.dequeue(); size++; }
+        q.enqueue(x);
+        for(int i=0;i<size;i++) q.enqueue(q.dequeue());
+    }
+    int pop() {
+        if(q.isEmpty()) return -1;
+        return q.dequeue();
+    }
+    int top() { return q.peek(); }
+};
+
+// ================== MENUS ==================
+void simpleQueueMenu() {
+    SimpleQueue q;
+    int choice, x;
+    do {
+        cout << "\n--- Simple Queue ---\n1.Enqueue\n2.Dequeue\n3.isEmpty\n4.isFull\n5.Display\n6.Peek\n7.Exit\nChoice: ";
+        cin >> choice;
+        switch(choice) {
+            case 1: cout<<"Enter element: ";cin>>x;q.enqueue(x);break;
+            case 2: cout<<"Dequeued: "<<q.dequeue()<<endl;break;
+            case 3: cout<<(q.isEmpty()?"Empty\n":"Not Empty\n");break;
+            case 4: cout<<(q.isFull()?"Full\n":"Not Full\n");break;
+            case 5: q.display();break;
+            case 6: cout<<"Front: "<<q.peek()<<endl;break;
+        }
+    } while(choice!=7);
+}
+
+void circularQueueMenu() {
+    CircularQueue q;
+    int choice, x;
+    do {
+        cout << "\n--- Circular Queue ---\n1.Enqueue\n2.Dequeue\n3.isEmpty\n4.isFull\n5.Display\n6.Peek\n7.Exit\nChoice: ";
+        cin >> choice;
+        switch(choice) {
+            case 1: cout<<"Enter element: ";cin>>x;q.enqueue(x);break;
+            case 2: cout<<"Dequeued: "<<q.dequeue()<<endl;break;
+            case 3: cout<<(q.isEmpty()?"Empty\n":"Not Empty\n");break;
+            case 4: cout<<(q.isFull()?"Full\n":"Not Full\n");break;
+            case 5: q.display();break;
+            case 6: cout<<"Front: "<<q.peek()<<endl;break;
+        }
+    } while(choice!=7);
+}
+
+void stackUsingQueuesMenu() {
+    int choice, type, x;
+    cout << "1. Two Queues\n2. One Queue\nChoice: ";
+    cin >> type;
+    if(type==1) {
+        Stack2Q s;
+        do {
+            cout<<"\n--- Stack using Two Queues ---\n1.Push\n2.Pop\n3.Top\n4.Exit\nChoice: ";
+            cin>>choice;
+            switch(choice) {
+                case 1: cout<<"Enter element: ";cin>>x;s.push(x);break;
+                case 2: cout<<"Popped: "<<s.pop()<<endl;break;
+                case 3: cout<<"Top: "<<s.top()<<endl;break;
+            }
+        } while(choice!=4);
+    } else {
+        Stack1Q s;
+        do {
+            cout<<"\n--- Stack using One Queue ---\n1.Push\n2.Pop\n3.Top\n4.Exit\nChoice: ";
+            cin>>choice;
+            switch(choice) {
+                case 1: cout<<"Enter element: ";cin>>x;s.push(x);break;
+                case 2: cout<<"Popped: "<<s.pop()<<endl;break;
+                case 3: cout<<"Top: "<<s.top()<<endl;break;
+            }
+        } while(choice!=4);
+    }
+}
+
+// ================== MAIN MENU ==================
+int main() {
+    int choice;
+    do {
+        cout << "\n========= MAIN MENU =========\n";
+        cout << "1. Simple Queue\n2. Circular Queue\n3. Interleave Queue\n4. First Non-Repeating Character\n5. Stack using Queues\n6. Exit\nChoice: ";
+        cin >> choice;
+        switch(choice) {
+            case 1: simpleQueueMenu(); break;
+            case 2: circularQueueMenu(); break;
+            case 3: interleaveQueue(); break;
+            case 4: firstNonRepeating(); break;
+            case 5: stackUsingQueuesMenu(); break;
+            case 6: cout<<"Exiting...\n"; break;
+            default: cout<<"Invalid!\n";
+        }
+    } while(choice!=6);
+    return 0;
+}
