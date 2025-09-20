@@ -1,0 +1,208 @@
+#include <iostream>
+using namespace std;
+
+#define MAX 100
+
+// ===== Array Operations =====
+int arr[MAX], n = 0;
+
+void createArray() {
+    cout << "Enter number of elements: ";
+    cin >> n;
+    cout << "Enter elements: ";
+    for (int i = 0; i < n; i++) cin >> arr[i];
+}
+
+void displayArray() {
+    if (n == 0) {
+        cout << "Array is empty!\n";
+        return;
+    }
+    cout << "Array elements: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << "\n";
+}
+
+void insertElement() {
+    int pos, val;
+    if (n == MAX) {
+        cout << "Array full!\n";
+        return;
+    }
+    cout << "Enter position (0-" << n << "): ";
+    cin >> pos;
+    cout << "Enter value: ";
+    cin >> val;
+    for (int i = n; i > pos; i--)
+        arr[i] = arr[i - 1];
+    arr[pos] = val;
+    n++;
+}
+
+void deleteElement() {
+    int pos;
+    if (n == 0) {
+        cout << "Array empty!\n";
+        return;
+    }
+    cout << "Enter position (0-" << n - 1 << "): ";
+    cin >> pos;
+    for (int i = pos; i < n - 1; i++)
+        arr[i] = arr[i + 1];
+    n--;
+}
+
+void linearSearch() {
+    int key, found = -1;
+    cout << "Enter element to search: ";
+    cin >> key;
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == key) {
+            found = i;
+            break;
+        }
+    }
+    if (found != -1)
+        cout << "Element found at position " << found << "\n";
+    else
+        cout << "Element not found!\n";
+}
+
+void removeDuplicates() {
+    for (int i = 0; i < n; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (arr[i] == arr[j]) {
+                for (int k = j; k < n - 1; k++)
+                    arr[k] = arr[k + 1];
+                n--;
+                j--;
+            }
+        }
+    }
+    cout << "Array after removing duplicates: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << "\n";
+}
+
+void reverseArray() {
+    for (int i = 0; i < n / 2; i++) {
+        int temp = arr[i];
+        arr[i] = arr[n - 1 - i];
+        arr[n - 1 - i] = temp;
+    }
+    cout << "Reversed array: ";
+    for (int i = 0; i < n; i++) cout << arr[i] << " ";
+    cout << "\n";
+}
+
+// ===== Matrix Operations =====
+void matrixMultiplication() {
+    int a[10][10], b[10][10], c[10][10], n;
+    cout << "Enter size of square matrix: ";
+    cin >> n;
+
+    cout << "Enter matrix A:\n";
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    cout << "Enter matrix B:\n";
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> b[i][j];
+
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++) {
+            c[i][j] = 0;
+            for (int k = 0; k < n; k++)
+                c[i][j] += a[i][k] * b[k][j];
+        }
+
+    cout << "Matrix multiplication result:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++)
+            cout << c[i][j] << " ";
+        cout << "\n";
+    }
+}
+
+void transposeMatrix() {
+    int a[10][10], n;
+    cout << "Enter size of square matrix: ";
+    cin >> n;
+    cout << "Enter matrix:\n";
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            cin >> a[i][j];
+
+    cout << "Transpose of matrix:\n";
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++)
+            cout << a[j][i] << " ";
+        cout << "\n";
+    }
+}
+
+void rowColSum() {
+    int a[10][10], n, m;
+    cout << "Enter rows and columns: ";
+    cin >> n >> m;
+    cout << "Enter matrix:\n";
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < m; j++)
+            cin >> a[i][j];
+
+    for (int i = 0; i < n; i++) {
+        int rowSum = 0;
+        for (int j = 0; j < m; j++)
+            rowSum += a[i][j];
+        cout << "Sum of row " << i << " = " << rowSum << "\n";
+    }
+
+    for (int j = 0; j < m; j++) {
+        int colSum = 0;
+        for (int i = 0; i < n; i++)
+            colSum += a[i][j];
+        cout << "Sum of column " << j << " = " << colSum << "\n";
+    }
+}
+
+// ===== Prediction Question =====
+void predictOutput() {
+    int arr[5] = {1};
+    cout << "Output will be: ";
+    for (int i = 0; i < 5; i++)
+        cout << arr[i];
+    cout << "\n";
+}
+
+// ===== Main Menu =====
+int main() {
+    int choice;
+    while (true) {
+        cout << "\n===== MAIN MENU =====\n";
+        cout << "1. CREATE ARRAY\n2. DISPLAY ARRAY\n3. INSERT ELEMENT\n4. DELETE ELEMENT\n";
+        cout << "5. LINEAR SEARCH\n6. REMOVE DUPLICATES\n7. REVERSE ARRAY\n";
+        cout << "8. MATRIX MULTIPLICATION\n9. TRANSPOSE MATRIX\n10. ROW & COLUMN SUMS\n";
+        cout << "11. PREDICT OUTPUT\n12. EXIT\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: createArray(); break;
+            case 2: displayArray(); break;
+            case 3: insertElement(); break;
+            case 4: deleteElement(); break;
+            case 5: linearSearch(); break;
+            case 6: removeDuplicates(); break;
+            case 7: reverseArray(); break;
+            case 8: matrixMultiplication(); break;
+            case 9: transposeMatrix(); break;
+            case 10: rowColSum(); break;
+            case 11: predictOutput(); break;
+            case 12: exit(0);
+            default: cout << "Invalid choice!\n";
+        }
+    }
+    return 0;
+}
