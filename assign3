@@ -1,0 +1,179 @@
+#include <iostream>
+#include <cstring>
+#include <cctype>
+#include <cmath>
+using namespace std;
+
+#define MAX 100
+
+class Stack {
+    char arr[MAX];
+    int top;
+public:
+    Stack() { top = -1; }
+    bool isEmpty() { return top == -1; }
+    bool isFull() { return top == MAX-1; }
+    void push(char x) {
+        if(isFull()) cout << "Stack Overflow\n";
+        else arr[++top] = x;
+    }
+    char pop() {
+        if(isEmpty()) {
+            cout << "Stack Underflow\n";
+            return '\0';
+        }
+        return arr[top--];
+    }
+    char peek() {
+        if(isEmpty()) return '\0';
+        return arr[top];
+    }
+    void display() {
+        if(isEmpty()) cout << "Stack is Empty\n";
+        else {
+            for(int i=0;i<=top;i++) cout << arr[i] << " ";
+            cout << endl;
+        }
+    }
+};
+
+// ============ 2. Reverse string ============
+void reverseString() {
+    Stack s;
+    char str[MAX];
+    cout << "Enter string: ";
+    cin >> str;
+    for(int i=0; str[i]!='\0'; i++) s.push(str[i]);
+    cout << "Reversed: ";
+    while(!s.isEmpty()) cout << s.pop();
+    cout << endl;
+}
+
+// ============ 3. Balanced Parentheses ============
+bool isBalanced(char exp[]) {
+    Stack s;
+    for(int i=0; exp[i]!='\0'; i++) {
+        char ch = exp[i];
+        if(ch=='(' || ch=='{' || ch=='[') s.push(ch);
+        else if(ch==')' || ch=='}' || ch==']') {
+            if(s.isEmpty()) return false;
+            char top = s.pop();
+            if((ch==')' && top!='(') || (ch=='}' && top!='{') || (ch==']' && top!='['))
+                return false;
+        }
+    }
+    return s.isEmpty();
+}
+
+// ============ 4. Infix to Postfix ============
+int precedence(char op) {
+    if(op=='^') return 3;
+    if(op=='*' || op=='/') return 2;
+    if(op=='+' || op=='-') return 1;
+    return 0;
+}
+void infixToPostfix() {
+    Stack s;
+    char infix[MAX], postfix[MAX]; int k=0;
+    cout << "Enter infix expression: ";
+    cin >> infix;
+    for(int i=0; infix[i]!='\0'; i++) {
+        char ch = infix[i];
+        if(isalnum(ch)) postfix[k++] = ch;
+        else if(ch=='(') s.push(ch);
+        else if(ch==')') {
+            while(!s.isEmpty() && s.peek()!='(') postfix[k++] = s.pop();
+            s.pop(); // remove '('
+        }
+        else {
+            while(!s.isEmpty() && precedence(s.peek())>=precedence(ch))
+                postfix[k++] = s.pop();
+            s.push(ch);
+        }
+    }
+    while(!s.isEmpty()) postfix[k++] = s.pop();
+    postfix[k]='\0';
+    cout << "Postfix: " << postfix << endl;
+}
+
+// ============ 5. Evaluate Postfix ============
+class IntStack {
+    int arr[MAX], top;
+public:
+    IntStack(){ top=-1; }
+    bool isEmpty(){ return top==-1; }
+    void push(int x){ arr[++top]=x; }
+    int pop(){ return arr[top--]; }
+    int peek(){ return arr[top]; }
+};
+void evaluatePostfix() {
+    char postfix[MAX];
+    cout << "Enter postfix expression: ";
+    cin >> postfix;
+    IntStack s;
+    for(int i=0; postfix[i]!='\0'; i++) {
+        char ch = postfix[i];
+        if(isdigit(ch)) s.push(ch-'0');
+        else {
+            int b = s.pop();
+            int a = s.pop();
+            switch(ch) {
+                case '+': s.push(a+b); break;
+                case '-': s.push(a-b); break;
+                case '*': s.push(a*b); break;
+                case '/': s.push(a/b); break;
+                case '^': s.push(pow(a,b)); break;
+            }
+        }
+    }
+    cout << "Result: " << s.pop() << endl;
+}
+
+// ============ 1. Stack Menu ============
+void stackMenu() {
+    Stack s;
+    int choice; char x;
+    do {
+        cout << "\n--- Stack Operations ---\n";
+        cout << "1. Push\n2. Pop\n3. isEmpty\n4. isFull\n5. Display\n6. Peek\n7. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+        switch(choice) {
+            case 1: cout << "Enter element: "; cin >> x; s.push(x); break;
+            case 2: cout << "Popped: " << s.pop() << endl; break;
+            case 3: cout << (s.isEmpty() ? "Stack Empty\n" : "Not Empty\n"); break;
+            case 4: cout << (s.isFull() ? "Stack Full\n" : "Not Full\n"); break;
+            case 5: s.display(); break;
+            case 6: cout << "Top: " << s.peek() << endl; break;
+            case 7: break;
+            default: cout << "Invalid choice\n";
+        }
+    } while(choice!=7);
+}
+
+// ============ Main Menu ============
+int main() {
+    int choice;
+    do {
+        cout << "\n========= MAIN MENU =========\n";
+        cout << "1. Stack Operations\n2. Reverse String\n3. Balanced Parentheses\n4. Infix to Postfix\n5. Evaluate Postfix\n6. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+        switch(choice) {
+            case 1: stackMenu(); break;
+            case 2: reverseString(); break;
+            case 3: {
+                char exp[MAX];
+                cout << "Enter expression: ";
+                cin >> exp;
+                cout << (isBalanced(exp) ? "Balanced\n" : "Not Balanced\n");
+                break;
+            }
+            case 4: infixToPostfix(); break;
+            case 5: evaluatePostfix(); break;
+            case 6: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice!\n";
+        }
+    } while(choice!=6);
+    return 0;
+}
