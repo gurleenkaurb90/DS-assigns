@@ -56,3 +56,75 @@ int main(){
     cout<<endl;
     return 0;
 }
+// QUE 2:
+(a) Search non recursive:
+void search(Node*root,int key){
+    while(root!=nullptr&&root->data!=key){
+        if(key<root->data){
+            root = root->left;
+        }
+        else{
+            root = root->right;
+        }
+    }
+    if(root == nullptr){
+        cout<<"Key not found"<<endl;
+    }
+    else
+    cout<<"Key found"<<endl;
+}
+(b) Search recursive:
+void searchRecursive(Node*root,int key){
+    if(root ==nullptr){
+        cout<<"Key not found"<<endl;
+        return;
+    }
+    if(root->data == key){
+        cout<<"Key found!!"<<endl;
+        return;
+    }
+    if(key<root->data)
+    searchRecursive(root->left,key);
+    if(key>root->data)
+    searchRecursive(root->right,key);
+}
+(c) MAXIMUM ELEMENT OF THE BST:
+    void Maximum(Node*root){
+    if(root == nullptr){
+        cout<<"Tree is empty"<<endl;
+        return;
+    }
+    while(root->right!=nullptr){
+        root = root->right;
+    }
+    cout<<"Maximum element is "<<root->data<<endl;
+    
+}
+(d) MINIMUM ELEMENT OF THE BST:
+    void Minimum(Node*root){
+    if(root == nullptr){
+        cout<<"Tree is empty"<<endl;
+        return;
+    }
+    while(root->left!=nullptr){
+        root = root->left;
+    }
+    cout<<"Minimum element is"<<root->data<<endl;
+}
+(e) INORDER SUCCESSOR OF A NODE:
+    Node*InorderSuccessor(Node*node){
+    if(node == nullptr){
+        return nullptr;
+    }
+    if(node->right!=nullptr){
+        return treeMinimum(node->right);
+    }
+    Node*parent = node->parent;
+    while(parent!=nullptr&&node == parent->right){
+        node = parent;
+        parent = parent->parent;
+    }
+    return parent;
+}
+(f) INORDER PREDECESSOR OF A NODE:
+    
