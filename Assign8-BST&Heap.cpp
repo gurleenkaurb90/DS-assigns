@@ -127,4 +127,29 @@ void searchRecursive(Node*root,int key){
     return parent;
 }
 (f) INORDER PREDECESSOR OF A NODE:
+    ode*predecessor(Node*node){
+    if(node == nullptr){
+        cout<<"No node"<<endl;
+        return nullptr;
+    }
+    if(node->left!=nullptr){
+        node = node->left;
+       
+            while(node->right!=nullptr){
+                node = node->right;
+            }
+            return node;
+        
+        
+    }
+    if(node->left == nullptr ){
+        Node*parent = node->parent;
+        while(parent!=nullptr && node==parent->left){
+            node = parent;
+            parent = parent->parent;
+        }
+       
+        return parent;
+    }
+}
     
