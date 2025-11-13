@@ -57,7 +57,7 @@ int main(){
     return 0;
 }
 // QUE 2:
-(a) Search non recursive:
+//(a) Search non recursive:
 void search(Node*root,int key){
     while(root!=nullptr&&root->data!=key){
         if(key<root->data){
@@ -73,7 +73,7 @@ void search(Node*root,int key){
     else
     cout<<"Key found"<<endl;
 }
-(b) Search recursive:
+//(b) Search recursive:
 void searchRecursive(Node*root,int key){
     if(root ==nullptr){
         cout<<"Key not found"<<endl;
@@ -88,7 +88,7 @@ void searchRecursive(Node*root,int key){
     if(key>root->data)
     searchRecursive(root->right,key);
 }
-(c) MAXIMUM ELEMENT OF THE BST:
+//(c) MAXIMUM ELEMENT OF THE BST:
     void Maximum(Node*root){
     if(root == nullptr){
         cout<<"Tree is empty"<<endl;
@@ -100,7 +100,7 @@ void searchRecursive(Node*root,int key){
     cout<<"Maximum element is "<<root->data<<endl;
     
 }
-(d) MINIMUM ELEMENT OF THE BST:
+//(d) MINIMUM ELEMENT OF THE BST:
     void Minimum(Node*root){
     if(root == nullptr){
         cout<<"Tree is empty"<<endl;
@@ -111,7 +111,7 @@ void searchRecursive(Node*root,int key){
     }
     cout<<"Minimum element is"<<root->data<<endl;
 }
-(e) INORDER SUCCESSOR OF A NODE:
+//(e) INORDER SUCCESSOR OF A NODE:
     Node*InorderSuccessor(Node*node){
     if(node == nullptr){
         return nullptr;
@@ -126,7 +126,7 @@ void searchRecursive(Node*root,int key){
     }
     return parent;
 }
-(f) INORDER PREDECESSOR OF A NODE:
+//(f) INORDER PREDECESSOR OF A NODE:
     ode*predecessor(Node*node){
     if(node == nullptr){
         cout<<"No node"<<endl;
@@ -152,4 +152,34 @@ void searchRecursive(Node*root,int key){
         return parent;
     }
 }
+// QUE : 3
+//(a) Insert an element (no duplicates are allowed), 
+Node*insert(Node*root,Node*newNode){
+    if(root == nullptr){
+        return newNode;
+    }
+    Node*curr = root;
+    Node*prev = nullptr;
+    while(curr!=nullptr){
+        if(newNode->data < curr->data){
+            prev = curr;
+        curr = curr->left;}
+        else if(newNode->data > curr->data){
+            prev = curr;
+        curr = curr->right;}
+        else if(newNode->data == curr->data){
+            cout<<"Duplicate node!!"<<endl;
+            return root;
+        }
+    }
+    curr = newNode;
+    if(newNode->data > prev->data)
+    prev->right = curr;
+    else
+    prev->left = curr;
+    return root;
+}
+//(b)  Delete an existing element,  
+
+
     
