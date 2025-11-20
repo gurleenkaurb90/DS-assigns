@@ -180,6 +180,96 @@ Node*insert(Node*root,Node*newNode){
     return root;
 }
 //(b)  Delete an existing element,  
+Node*delete(Node*root,Node*node){
+    if(root == nullptr){
+        cout<<"Tree is empty: nothing to be deleted !!"<<endl;
+        return nullptr;
+    }
+    Node*curr = root;
+    Node*prev = nullptr;
+    while(curr->data!=node->data || curr!=nullptr){
+        prev = curr;
+        if(node->data<prev->data)
+        node = node->left;
+        else if(node->data>prev->data)
+        node = node->right;
+    }
+    if(curr == nullptr){
+        cout<<"Node to be deleted not found!!"<<endl;
+        return root;
+    }
+    if(curr->left == nullptr || curr->right == nullptr){
+        if(prev->right == curr){
+            prev->right = curr->right;
+            delete curr;
+            return root;
+        }
+       else if(prev->left = curr){
+        prev->left =curr->left;
+        delete curr;
+        return root;}
+    }
+    Node*succ;
+    if(curr->left!=nullptr&& curr->right!=nullptr){
+        succ = Minimum(curr->right);
+        if(prev->right = curr){
+            prev->right = succ;
+            delete succ;
+            return root;
+        }
+        else if(prev->left = curr){
+            prev->left = succ;
+            delete succ;
+            return root;
+        }
+    }
+}
+// (c) MAXIMUM DEPTH OF A TREE:
+int maxDepth(Node*root){
+    if(root == nullptr)
+    return -1;
+    int leftSubtree = maxDepth(root->left);
+    int rightSubtree = maxDepth(root->right);
+    int max ;
+    if(leftSubtree>rightSubtree)
+    max = leftSubtree;
+    else
+    max = rightSubtree;
+    return 1+max;
+}
+// (d) MINIMUM DEPTH OF A TREE:
+int minDepth(Node*root){
+    if(root == nullptr)
+    return -1;
+    if(root->left == nullptr && root->right == nullptr){
+        return 0;
+    }
+    int leftSubtree = minDepth(root->left);
+    int rightSubtree = minDepth(root->right);
+    if(root->left == nullptr)
+    return 1+rightSubtree;
+    else if(root->right == nullptr)
+    return 1+ leftSubtree;
+    int min;
+    else{
+    if(leftSubtree <rightSubtree)
+    min = leftSubtree;
+    else 
+    min = rightSubtree;
+    return 1+min;
+ }
+ 
+}
+// QUE 4:
+bool isBST(Node*root, int min= INT_MIN, int max= INT_max){
+    if (root == nullptr)
+    return true;
+    if(root->data<min || root->data>max)
+    return false;
+    return isBST(root->left, min, root->data - 1) &&
+           isBST(root->right, root->data + 1, max);
+}
+// QUE 5 :
 
 
     
